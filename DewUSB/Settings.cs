@@ -6,8 +6,13 @@ namespace DewUSB
 {
     public class Settings
     {
-        public bool StartWithWindows { get; set; }
-        public bool MinimizeToTray { get; set; }
+        public bool StartWithWindows { get; set; }= false; // 默认不开机自启
+        public bool MinimizeToTray { get; set; }= true; // 默认最小化到托盘
+        public int Theme { get; set; } = 2;
+
+        public bool TopMost { get; set; } = false; // 默认不设置为置顶
+
+        public int Position { get; set; } = 2; // 默认右下
 
         private static readonly string SettingsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

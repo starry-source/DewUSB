@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -12,7 +13,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using Microsoft.Win32;
+using Wpf.Ui;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Application = System.Windows.Application;
@@ -41,8 +42,6 @@ namespace DewUSB
         public MainWindow()
         {
             InitializeComponent();
-            // 禁止调整窗口大小
-            ResizeMode = ResizeMode.NoResize;
             // 获取控件引用
             devicesPanel = (System.Windows.Controls.StackPanel)FindName("DevicesPanel");
             messageText = (Wpf.Ui.Controls.TextBlock)FindName("MessageText");
@@ -63,7 +62,6 @@ namespace DewUSB
                 RegisterForDeviceNotifications();
                 UpdateDevices();
             };
-
 
             StateChanged += OnStateChanged;
 
@@ -133,11 +131,11 @@ namespace DewUSB
         {
             if (WindowState == WindowState.Minimized)
             {
-                if (settings.MinimizeToTray)
-                {
+                //if (settings.MinimizeToTray)
+                //{
+
                     Hide();
-                    WindowState = WindowState.Minimized;
-                }
+                //}
             }
         }
 
@@ -147,21 +145,36 @@ namespace DewUSB
         private void SetupWindowTheme()
         {
 
-
-            SystemThemeWatcher.Watch(this as System.Windows.Window);
-            Loaded += (sender, args) =>
+            if (settings.Theme == 2)
             {
-                Wpf.Ui.Appearance.SystemThemeWatcher.Watch(
-                    this,                                    // Window class
-                    Wpf.Ui.Controls.WindowBackdropType.Mica, // Background type
-                    true                                     // Whether to change accents automatically
-                );
-            };
+                // 跟随系统主题
+                Wpf.Ui.Appearance.SystemThemeWatcher.Watch(this as System.Windows.Window);
+            }
+            else if (settings.Theme == 0)
+            {
+                // 深色主题
+                (new ThemeService()).SetTheme(Wpf.Ui.Appearance.ApplicationTheme.Dark);
+            }
+            else if (settings.Theme == 1)
+            {
+                // 浅色主题
+                (new ThemeService()).SetTheme(Wpf.Ui.Appearance.ApplicationTheme.Light);
+            }
+
+            //SystemThemeWatcher.Watch(this as System.Windows.Window);
+            //Loaded += (sender, args) =>
+            //{
+            //    Wpf.Ui.Appearance.SystemThemeWatcher.Watch(
+            //        this,                                    // Window class
+            //        Wpf.Ui.Controls.WindowBackdropType.Mica, // Background type
+            //        true                                     // Whether to change accents automatically
+            //    );
+            //};
         }
 
-        /// <summary>
-        /// 初始化消息定时器
-        /// </summary>
+            /// <summary>
+            /// 初始化消息定时器
+            /// </summary>
         private void InitializeMessageTimer()
         {
             messageTimer = new DispatcherTimer
@@ -210,18 +223,18 @@ namespace DewUSB
             var image = new Wpf.Ui.Controls.Image
             {
                 Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/ud.png")),
-                Width = 80,
-                Height = 90,
-                Margin = new Thickness(10),
+                Width = 60,
+                Height = 70,
+                Margin = new Thickness(10,10,5,10),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             Grid.SetColumn(image, 0);
-            var infoPanel = new System.Windows.Controls.StackPanel { Margin = new Thickness(10, 10, 10, 10) };
+            var infoPanel = new System.Windows.Controls.StackPanel { Margin = new Thickness(0, 20, 20, 20) };
             Grid.SetColumn(infoPanel, 1);
             var headerPanel = new System.Windows.Controls.StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
-                Margin = new Thickness(0, 0, 0, 5)
+                Margin = new Thickness(0, 0, 0, 2)
             };
             var driveName = new Wpf.Ui.Controls.TextBlock
             {
@@ -244,23 +257,23 @@ namespace DewUSB
             };
             headerPanel.Children.Add(driveName);
             headerPanel.Children.Add(driveLabel);
-            var progressContainer = new Grid { Margin = new Thickness(0, 5, 0, 5) };
+            var progressContainer = new Grid();
             progressContainer.ColumnDefinitions.Add(new ColumnDefinition());
             progressContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var progressBar = new System.Windows.Controls.ProgressBar
             {
-                Height = 5,
+                Height = 6,
                 Minimum = 0,
                 Maximum = 100,
                 Value = ((double)(drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize) * 100,
-                Margin = new Thickness(0, 0, 8, 0),
+                Margin = new Thickness(0, 0, 5, 0),
             };
             Grid.SetColumn(progressBar, 0);
             var spaceInfo = new Wpf.Ui.Controls.TextBlock
             {
                 Text = $"{FormatBytes(drive.AvailableFreeSpace)}/{FormatBytes(drive.TotalSize)}",
                 FontSize = 12,
-                Margin = new Thickness(8, 0, 0, 0),
+                Margin = new Thickness(8, 0, 2, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
             Grid.SetColumn(spaceInfo, 1);
@@ -269,7 +282,7 @@ namespace DewUSB
             var buttonsPanel = new System.Windows.Controls.StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
-                Margin = new Thickness(0, 10, 0, 0)
+                Margin = new Thickness(0, 5, 0, 0)
             };
             var openButton = new Wpf.Ui.Controls.Button
             {
@@ -494,10 +507,36 @@ namespace DewUSB
                 var transform = source.CompositionTarget.TransformFromDevice;
                 dpiFactor = transform.M11;
             }
+            if(settings.Position == 0) // 左上
+            {
+                Left = 20;
+                Top = 20;
+            }
+            else if(settings.Position == 1) // 左下
+            {
+                Left = 20;
+                Top = (workingArea.Bottom * dpiFactor) - Height - 20;
+            }
+            else if(settings.Position==3) // 居中
+            {
+                Left = (workingArea.Width * dpiFactor - Width) / 2 + workingArea.Left;
+                Top = (workingArea.Height * dpiFactor - Height) / 2 + workingArea.Top;
+            }
+            else
+            {
+                // 右下角位置
+                Left = (workingArea.Right * dpiFactor) - Width - 20;
+                Top = (workingArea.Bottom * dpiFactor) - Height - 20;
+            }
 
-            // 根据 DPI 缩放转换工作区坐标到DIP，再设置窗口位置
-            Left = (workingArea.Right * dpiFactor) - Width - 20;
-            Top = (workingArea.Bottom * dpiFactor) - Height - 20;
+            if (settings.TopMost)
+            {
+                Topmost = true;
+            }
+            else
+            {
+                Topmost = false;
+            }
 
             // 没有U盘时，隐藏窗口
             if (deviceGrids.Count == 0)
@@ -570,8 +609,8 @@ namespace DewUSB
         /// </summary>
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            //tray?.Dispose();
-            //base.OnClosing(e);
+            // 阻止程序关闭
+            base.OnClosing(e);
         }
     }
 }

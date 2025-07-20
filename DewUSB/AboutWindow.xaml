@@ -6,12 +6,13 @@ xmlns:local="clr-namespace:DewUSB"
 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 x:Class="DewUSB.AboutWindow"
 mc:Ignorable="d"
-Title="关于" Height="300" Width="400"
+Title="关于" MinHeight="300" MinWidth="300"
+Width="400" Height="350"
 WindowBackdropType="Mica"
 WindowStartupLocation="CenterScreen"
 ExtendsContentIntoTitleBar="True"
 WindowCornerPreference="Round"
-ResizeMode="NoResize">
+>
     
     <Grid>
 
@@ -24,30 +25,30 @@ ResizeMode="NoResize">
 	   CanMaximize="False"
 	   ShowMaximize="False"
 	   ShowMinimize="False"/>
-        <StackPanel Margin="20">
+        <StackPanel Margin="0,0,0,30" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1">
             <ui:Image Source="/ud.png" 
                      Width="64" 
                      Height="64" 
-                     Margin="0,40,0,20"/>
+                     Margin="0,0,0,10"/>
             
             <ui:TextBlock Text="DewUSB"
                          FontSize="24"
-                         FontWeight="100"
+                         FontWeight="Thin"
                          HorizontalAlignment="Center"/>
             
             <ui:TextBlock Text="由星源开发 · Developed by Starry Source"
                          FontSize="14"
                          HorizontalAlignment="Center"
-                         Margin="0,10,0,0"/>
+                         Margin="0,15,0,0"/>
             
             <ui:TextBlock Text="简约的U盘助手"
                          FontSize="14"
                          HorizontalAlignment="Center"
                          Margin="0,5"/>
             
-            <ui:Button Content="访问项目主页"
+            <ui:Button Content="在 Github 查看"
                       HorizontalAlignment="Center"
-                      Margin="0,20,0,0"
+                      Margin="0,25,0,0"
                       x:Name="VisitProjectButton"/>
         </StackPanel>
     </Grid>

@@ -1,5 +1,12 @@
+using DewUSB.Properties;
+using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Media.TextFormatting;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DewUSB
 {
@@ -20,12 +27,30 @@ namespace DewUSB
         public SettingsWindow(Settings currentSettings)
         {
             InitializeComponent();
+            Topmost = false;
             settings = currentSettings;
-            
+
             // 根据当前设置更新UI控件状态
             StartWithWindows.IsChecked = settings.StartWithWindows;
             MinimizeToTray.IsChecked = settings.MinimizeToTray;
 
+            ThemeSelector.ItemsSource = new List<string>{
+                "深色",
+                "浅色",
+                "跟随系统"
+            };
+
+            ThemeSelector.SelectedIndex = settings.Theme;
+            TopMost.IsChecked = settings.TopMost;
+
+
+            Position.ItemsSource = new List<string>{
+                "左上角",
+                "左下角",
+                "右下角",
+                "居中"
+            };
+            Position.SelectedIndex = settings.Position;
             // 注册保存按钮的点击事件
             SaveButton.Click += SaveButton_Click;
         }
@@ -38,13 +63,73 @@ namespace DewUSB
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             // 从UI更新设置值
-            settings.StartWithWindows = StartWithWindows.IsChecked ?? false;
-            settings.MinimizeToTray = MinimizeToTray.IsChecked ?? true;
+
+            bool restart = ThemeSelector.SelectedIndex != settings.Theme ||
+                TopMost.IsChecked != settings.TopMost;
+
+            settings.StartWithWindows = (bool)StartWithWindows.IsChecked;
+            settings.MinimizeToTray = (bool)MinimizeToTray.IsChecked;
+            settings.Theme = ThemeSelector.SelectedIndex;
+            settings.TopMost = (bool)TopMost.IsChecked;
+            settings.Position = Position.SelectedIndex;
+
             settings.Save();
-            
-            // 关闭窗口并返回成功结果
-            DialogResult = true;
+
+            if (restart)
+            {
+                // 如果主题或置顶状态改变，提示用户重启应用
+                fly.Visibility = Visibility.Visible;
+                mainContent.Effect = new System.Windows.Media.Effects.BlurEffect
+                {
+                    Radius = 25
+                };
+                mainContent.IsEnabled = false;
+                SaveButton.IsEnabled = false;
+            }
+            else
+            {
+                // 直接关闭设置窗口
+                Close();
+            }
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 取消设置，直接关闭窗口
             Close();
         }
+
+        private void RestartButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 重启应用程序
+            System.Diagnostics.Process.Start(AppDomain.CurrentDomain.FriendlyName);
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // 引导用户关闭自动播放通知
+            Hide();
+            System.Diagnostics.Process.Start("ms-settings:notifications");
+            // wpfui message box
+            var messageBox = new Wpf.Ui.Controls.MessageBox
+            {
+                Owner = this,
+                Title = "提示",
+                Content = new TextBlock
+                {
+                    Text = "请找到 “自动播放” 的通知开关，然后关闭它。\n这可以避免被弹出的通知遮挡。",
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 14,
+                },
+                ShowInTaskbar = false,
+                Topmost = true,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                ResizeMode = ResizeMode.NoResize,
+            };
+            messageBox.ShowDialogAsync();
+            Show();
+        }
+
     }
 }
