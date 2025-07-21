@@ -6,7 +6,7 @@ xmlns:local="clr-namespace:DewUSB"
 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 x:Class="DewUSB.AboutWindow"
 mc:Ignorable="d"
-Title="关于" MinHeight="300" MinWidth="300"
+Title="关于" MinHeight="350" MinWidth="320"
 Width="400" Height="350"
 WindowBackdropType="Mica"
 WindowStartupLocation="CenterScreen"
@@ -26,7 +26,7 @@ WindowCornerPreference="Round"
 	   ShowMaximize="False"
 	   ShowMinimize="False"/>
         <StackPanel Margin="0,0,0,30" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1">
-            <ui:Image Source="/ud.png" 
+            <ui:Image Source="pack://application:,,,/ud.png" 
                      Width="64" 
                      Height="64" 
                      Margin="0,0,0,10"/>
@@ -45,11 +45,12 @@ WindowCornerPreference="Round"
                          FontSize="14"
                          HorizontalAlignment="Center"
                          Margin="0,5"/>
-            
+
             <ui:Button Content="在 Github 查看"
                       HorizontalAlignment="Center"
-                      Margin="0,25,0,0"
+                      Margin="0,25,0,5"
                       x:Name="VisitProjectButton"/>
+            <ui:TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Text="如果觉得还不错，就给个 Star 吧 >u-)o"/>
         </StackPanel>
     </Grid>
 </ui:FluentWindow>

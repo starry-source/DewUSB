@@ -13,6 +13,9 @@ namespace DewUSB
         public bool TopMost { get; set; } = false; // 默认不设置为置顶
 
         public int Position { get; set; } = 2; // 默认右下
+        public int IconType { get; set; } = 0; // 默认彩色
+
+        public int WindowWidth { get; set; } = 400; // 默认窗口宽度
 
         private static readonly string SettingsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
