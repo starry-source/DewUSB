@@ -43,7 +43,6 @@ namespace DewUSB
             ThemeSelector.SelectedIndex = settings.Theme;
             TopMost.IsChecked = settings.TopMost;
 
-
             Position.ItemsSource = new List<string>{
                 "左上角",
                 "左下角",
@@ -51,6 +50,12 @@ namespace DewUSB
                 "居中"
             };
             Position.SelectedIndex = settings.Position;
+
+            IconType0.IsChecked = settings.IconType == 0; // 彩色图标
+            IconType1.IsChecked = settings.IconType == 1; // 灰色图标
+
+            WindowWidth.Value = settings.WindowWidth;
+
             // 注册保存按钮的点击事件
             SaveButton.Click += SaveButton_Click;
         }
@@ -64,20 +69,21 @@ namespace DewUSB
         {
             // 从UI更新设置值
 
-            bool restart = ThemeSelector.SelectedIndex != settings.Theme ||
-                TopMost.IsChecked != settings.TopMost;
+            bool restart = ThemeSelector.SelectedIndex != settings.Theme;
 
             settings.StartWithWindows = (bool)StartWithWindows.IsChecked;
             settings.MinimizeToTray = (bool)MinimizeToTray.IsChecked;
             settings.Theme = ThemeSelector.SelectedIndex;
             settings.TopMost = (bool)TopMost.IsChecked;
             settings.Position = Position.SelectedIndex;
+            settings.IconType = IconType0.IsChecked == true ? 0 : 1;
+            settings.WindowWidth = (int)WindowWidth.Value;
 
             settings.Save();
 
             if (restart)
             {
-                // 如果主题或置顶状态改变，提示用户重启应用
+                // 如果主题改变，提示用户重启应用
                 fly.Visibility = Visibility.Visible;
                 mainContent.Effect = new System.Windows.Media.Effects.BlurEffect
                 {
@@ -131,5 +137,27 @@ namespace DewUSB
             Show();
         }
 
+        private void IconType0_Checked(object sender, RoutedEventArgs e)
+        {
+            IconImage.Source = new System.Windows.Media.Imaging.BitmapImage(
+                new Uri("pack://application:,,,/ud.png"));
+        }
+
+        private void IconType1_Checked(object sender, RoutedEventArgs e)
+        {
+            // 根据当前应用的颜色主题
+            if (Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme() == Wpf.Ui.Appearance.ApplicationTheme.Dark)
+                IconImage.Source = new System.Windows.Media.Imaging.BitmapImage(
+                    new Uri("pack://application:,,,/uddark.png"));
+            else
+                IconImage.Source = new System.Windows.Media.Imaging.BitmapImage(
+                new Uri("pack://application:,,,/udlight.png"));
+        }
+
+        private void Restore_WindowWidth_Click(object sender, RoutedEventArgs e)
+        {
+            // 恢复窗口宽度
+            WindowWidth.Value = 400;
+        }
     }
 }

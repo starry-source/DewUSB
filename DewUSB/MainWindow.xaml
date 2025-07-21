@@ -6,7 +6,7 @@
                 x:Class="DewUSB.MainWindow"
                 mc:Ignorable="d"
                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                MinHeight="100" MinWidth="400"
+                MinHeight="100" MinWidth="350"
                 Width="400"
                 Title="DewUSB" WindowBackdropType="Mica" 
                 ExtendsContentIntoTitleBar="True" 
@@ -14,7 +14,7 @@
                 WindowStartupLocation="Manual"
                 ShowInTaskbar="False"
                 Topmost="False" WindowState="Minimized">
-    
+
     <Window.Resources>
         <local:MultiplyConverter x:Key="MultiplyConverter"/>
         <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#177f7f7f"/>
@@ -36,7 +36,7 @@
                         </BeginStoryboard>
                     </EventTrigger.Actions>
                 </EventTrigger>
-                
+
                 <EventTrigger RoutedEvent="MouseLeave">
                     <EventTrigger.Actions>
                         <BeginStoryboard>
@@ -67,21 +67,32 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Title="DewUSB" 
-                     VerticalAlignment="Top" 
-                     CanMaximize="False" 
-                     ShowMaximize="False" 
-                     ShowMinimize="True" 
-                     Height="38" 
-                     ShowClose="False"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ui:TitleBar Title="DewUSB" 
+                     ShowMinimize="False" 
+                     ShowMaximize="False"
+                     Height="38"
+                     ShowClose="False"
+                     VerticalAlignment="Center" />
+            <ui:Button Appearance="Transparent"  Width="45" Height="35" Grid.Column="1" BorderThickness="0" Padding="0" VerticalAlignment="Top" Click="Refresh_Button_Click">
+                <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="18"/>
+            </ui:Button>
+            <ui:Button Appearance="Transparent"  Width="45" Height="35" Grid.Column="2" BorderThickness="0" Padding="0" VerticalAlignment="Top" Click="Minimize_Button_Click">
+                <ui:SymbolIcon Symbol="ArrowCircleDownRight24" FontSize="18"/>
+            </ui:Button>
+        </Grid>
 
         <Grid Grid.Row="1">
             <ScrollViewer x:Name="MainScrollViewer"
-                         VerticalScrollBarVisibility="Disabled" 
                          Padding="0,5">
                 <StackPanel x:Name="DevicesPanel"/>
             </ScrollViewer>
-            
+
             <ui:TextBlock x:Name="MessageText" 
                          FontSize="16" Visibility="Collapsed"
                          Margin="0"  HorizontalAlignment="Center" VerticalAlignment="Center"/>

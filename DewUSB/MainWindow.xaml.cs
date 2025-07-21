@@ -160,16 +160,6 @@ namespace DewUSB
                 // 浅色主题
                 (new ThemeService()).SetTheme(Wpf.Ui.Appearance.ApplicationTheme.Light);
             }
-
-            //SystemThemeWatcher.Watch(this as System.Windows.Window);
-            //Loaded += (sender, args) =>
-            //{
-            //    Wpf.Ui.Appearance.SystemThemeWatcher.Watch(
-            //        this,                                    // Window class
-            //        Wpf.Ui.Controls.WindowBackdropType.Mica, // Background type
-            //        true                                     // Whether to change accents automatically
-            //    );
-            //};
         }
 
             /// <summary>
@@ -187,6 +177,7 @@ namespace DewUSB
                 messageTimer.Stop();
                 messageText.Visibility = Visibility.Collapsed;
                 MainScrollViewer.Effect = null;
+                MainScrollViewer.IsEnabled = true;
             };
         }
 
@@ -202,6 +193,7 @@ namespace DewUSB
                 Radius = 25,
                 KernelType = System.Windows.Media.Effects.KernelType.Gaussian
             };
+            MainScrollViewer.IsEnabled = false;
             messageTimer.Start();
             System.Windows.Controls.Panel.SetZIndex(messageText, 1000);
         }
@@ -220,9 +212,21 @@ namespace DewUSB
             contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(92) });
             contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             border.MouseLeftButtonDown += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+            string uri;
+            if (settings.IconType == 0)
+            {
+                uri = "pack://application:,,,/ud.png";
+            }
+            else
+            {
+                if(Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme() == Wpf.Ui.Appearance.ApplicationTheme.Dark)
+                    uri = "pack://application:,,,/uddark.png";
+                else
+                    uri = "pack://application:,,,/udlight.png";
+            }
             var image = new Wpf.Ui.Controls.Image
             {
-                Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/ud.png")),
+                Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(uri)),
                 Width = 60,
                 Height = 70,
                 Margin = new Thickness(10,10,5,10),
@@ -253,7 +257,7 @@ namespace DewUSB
             {
                 Text = drive.Name.TrimEnd('\\'),
                 FontSize = 12,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(200, 128, 128, 128))
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(225, 140, 140, 140))
             };
             headerPanel.Children.Add(driveName);
             headerPanel.Children.Add(driveLabel);
@@ -484,19 +488,7 @@ namespace DewUSB
             var workingArea = screen.WorkingArea;
 
             // 固定宽度
-            Width = 400;
-
-            // 计算内容高度（标题栏 + 设备卡片 * 数量 + 边距）
-            double contentHeight = 38 + (deviceGrids.Count * 150) + 10;
-            double maxHeight = Math.Min(workingArea.Height * 0.5, contentHeight);  // 最大高度为屏幕高度的一半或内容高度
-            Height = Math.Max(100, maxHeight);  // 最小高度100
-
-            // 更新滚动条状态
-            if (scrollViewer != null)
-            {
-                scrollViewer.VerticalScrollBarVisibility =
-                    contentHeight > maxHeight ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
-            }
+            Width = settings.WindowWidth;
 
             // 处理 DPI 缩放问题
             double dpiFactor = 1.0;
@@ -504,9 +496,15 @@ namespace DewUSB
             if (source != null)
             {
                 // 该矩阵可将设备像素转换为DIP
-                var transform = source.CompositionTarget.TransformFromDevice;
-                dpiFactor = transform.M11;
+                dpiFactor = source.CompositionTarget.TransformFromDevice.M11;
             }
+
+            // 计算内容高度（标题栏 + 设备卡片 * 数量 + 边距）
+            double contentHeight = 38 + (deviceGrids.Count * 150) + 10;
+            double maxHeight = Math.Min(workingArea.Height * dpiFactor * 0.5, contentHeight);  // 最大高度为屏幕高度的一半或内容高度
+            Height = Math.Max(100, maxHeight);  // 最小高度100
+
+
             if(settings.Position == 0) // 左上
             {
                 Left = 20;
@@ -611,6 +609,16 @@ namespace DewUSB
         {
             // 阻止程序关闭
             base.OnClosing(e);
+        }
+
+        private void Minimize_Button_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void Refresh_Button_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateDevices();
         }
     }
 }
