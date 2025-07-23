@@ -41,6 +41,8 @@ namespace DewUSB
             };
 
             ThemeSelector.SelectedIndex = settings.Theme;
+
+
             TopMost.IsChecked = settings.TopMost;
 
             Position.ItemsSource = new List<string>{
@@ -56,8 +58,19 @@ namespace DewUSB
 
             WindowWidth.Value = settings.WindowWidth;
 
-            // 注册保存按钮的点击事件
-            SaveButton.Click += SaveButton_Click;
+            ShowOpen.IsChecked = settings.ShowOpen;
+            //StartWithWindows.Checked += change;
+            //StartWithWindows.Unchecked += change;
+            //MinimizeToTray.Checked += change;
+            //MinimizeToTray.Unchecked += change;
+            ThemeSelector.SelectionChanged += change;
+            //TopMost.Checked += change;
+            //TopMost.Unchecked += change;
+            //Position.SelectionChanged += change;
+            //IconType0.Checked += change;
+            //IconType1.Checked += change;
+            //WindowWidth.ValueChanged += change;
+            //ShowOpen.Checked += change;
         }
 
         /// <summary>
@@ -65,12 +78,28 @@ namespace DewUSB
         /// </summary>
         /// <param name="sender">事件源</param>
         /// <param name="e">事件参数</param>
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void change(object sender, RoutedEventArgs e)
         {
-            // 从UI更新设置值
 
-            bool restart = ThemeSelector.SelectedIndex != settings.Theme;
+            if (ThemeSelector.SelectedIndex != settings.Theme)
+            {
+                Tip.Text = "部分设置需要重启程序才能生效。";
+                Tip.Opacity = 1;
+                CloseButton.Content = "暂不";
+                RestartButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Tip.Text = "关闭设置后，更改才能生效。";
+                Tip.Opacity = 0.5;
+                CloseButton.Content = "关闭";
+                RestartButton.Visibility= Visibility.Collapsed;
 
+            }
+        }
+
+        private void apply()
+        {
             settings.StartWithWindows = (bool)StartWithWindows.IsChecked;
             settings.MinimizeToTray = (bool)MinimizeToTray.IsChecked;
             settings.Theme = ThemeSelector.SelectedIndex;
@@ -78,36 +107,22 @@ namespace DewUSB
             settings.Position = Position.SelectedIndex;
             settings.IconType = IconType0.IsChecked == true ? 0 : 1;
             settings.WindowWidth = (int)WindowWidth.Value;
+            settings.ShowOpen = (bool)ShowOpen.IsChecked;
 
             settings.Save();
-
-            if (restart)
-            {
-                // 如果主题改变，提示用户重启应用
-                fly.Visibility = Visibility.Visible;
-                mainContent.Effect = new System.Windows.Media.Effects.BlurEffect
-                {
-                    Radius = 25
-                };
-                mainContent.IsEnabled = false;
-                SaveButton.IsEnabled = false;
-            }
-            else
-            {
-                // 直接关闭设置窗口
-                Close();
-            }
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             // 取消设置，直接关闭窗口
+            apply();
             Close();
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
         {
             // 重启应用程序
+            apply();
             System.Diagnostics.Process.Start(AppDomain.CurrentDomain.FriendlyName);
             System.Windows.Application.Current.Shutdown();
         }
@@ -116,17 +131,17 @@ namespace DewUSB
         {
             // 引导用户关闭自动播放通知
             Hide();
-            System.Diagnostics.Process.Start("ms-settings:notifications");
+            System.Diagnostics.Process.Start("ms-settings:autoplay");
             // wpfui message box
             var messageBox = new Wpf.Ui.Controls.MessageBox
             {
                 Owner = this,
-                Title = "提示",
+                Title = "操作引导",
                 Content = new TextBlock
                 {
-                    Text = "请找到 “自动播放” 的通知开关，然后关闭它。\n这可以避免被弹出的通知遮挡。",
+                    Text = "请将「可移动驱动器」默认行为改为「不执行操作」。\n这可以避免程序被遮挡或影响。\n设置完后，关闭此引导即可。",
                     TextWrapping = TextWrapping.Wrap,
-                    FontSize = 14,
+                    FontSize = 15,
                 },
                 ShowInTaskbar = false,
                 Topmost = true,
@@ -158,6 +173,11 @@ namespace DewUSB
         {
             // 恢复窗口宽度
             WindowWidth.Value = 400;
+        }
+
+        private void FluentWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            apply();
         }
     }
 }

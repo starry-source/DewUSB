@@ -98,4 +98,5 @@
                          Margin="0"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
+    
 </ui:FluentWindow>

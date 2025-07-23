@@ -190,8 +190,7 @@ namespace DewUSB
             messageText.Visibility = Visibility.Visible;
             MainScrollViewer.Effect = new System.Windows.Media.Effects.BlurEffect
             {
-                Radius = 25,
-                KernelType = System.Windows.Media.Effects.KernelType.Gaussian
+                Radius = 25
             };
             MainScrollViewer.IsEnabled = false;
             messageTimer.Start();
@@ -219,7 +218,7 @@ namespace DewUSB
             }
             else
             {
-                if(Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme() == Wpf.Ui.Appearance.ApplicationTheme.Dark)
+                if (Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme() == Wpf.Ui.Appearance.ApplicationTheme.Dark)
                     uri = "pack://application:,,,/uddark.png";
                 else
                     uri = "pack://application:,,,/udlight.png";
@@ -229,7 +228,7 @@ namespace DewUSB
                 Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(uri)),
                 Width = 60,
                 Height = 70,
-                Margin = new Thickness(10,10,5,10),
+                Margin = new Thickness(10, 10, 5, 10),
                 VerticalAlignment = VerticalAlignment.Center,
             };
             Grid.SetColumn(image, 0);
@@ -288,13 +287,17 @@ namespace DewUSB
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
                 Margin = new Thickness(0, 5, 0, 0)
             };
-            var openButton = new Wpf.Ui.Controls.Button
+            if (settings.ShowOpen)
             {
-                Content = "打开 U 盘",
-                Margin = new Thickness(0, 0, 10, 0),
-                Appearance=Wpf.Ui.Controls.ControlAppearance.Primary
-            };
-            openButton.Click += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+                var openButton = new Wpf.Ui.Controls.Button
+                {
+                    Content = "打开 U 盘",
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Appearance = Wpf.Ui.Controls.ControlAppearance.Primary
+                };
+                openButton.Click += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+                buttonsPanel.Children.Add(openButton);
+            }
             var ejectButton = new Wpf.Ui.Controls.Button
             {
                 Content = "安全弹出",
@@ -313,7 +316,6 @@ namespace DewUSB
                     ShowMessage("弹出失败");
                 }
             };
-            buttonsPanel.Children.Add(openButton);
             buttonsPanel.Children.Add(ejectButton);
             infoPanel.Children.Add(headerPanel);
             infoPanel.Children.Add(progressContainer);
@@ -550,11 +552,14 @@ namespace DewUSB
         private void ShowSettingsWindow()
         {
             var settingsWindow = new SettingsWindow(settings);
-            settingsWindow.Owner = this;
-            if (settingsWindow.ShowDialog() == true)
+            //settingsWindow.Owner = this;
+            settingsWindow.ShowDialog();
+            settings = Settings.Load();
+            try
             {
-                settings = Settings.Load(); // 重新加载设置
+                UpdateDevices();
             }
+            catch (Exception) { }
         }
 
         /// <summary>

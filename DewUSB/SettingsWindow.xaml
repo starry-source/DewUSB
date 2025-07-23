@@ -6,105 +6,116 @@ xmlns:local="clr-namespace:DewUSB"
 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 x:Class="DewUSB.SettingsWindow"
 mc:Ignorable="d"
-MinWidth="380"
-Title="设置" MinHeight="380" Width="420"
+MinWidth="740"
+Title="设置"
+MinHeight="380" Width="810"
 WindowBackdropType="Mica"
+Closing="FluentWindow_Closing"
 WindowStartupLocation="CenterScreen"
 ExtendsContentIntoTitleBar="True"
 WindowCornerPreference="Round">
-
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="70"/>
         </Grid.RowDefinitions>
-        <ui:TitleBar Title="设置"
-	   VerticalAlignment="Top"
-	   CanMaximize="False"
-	   ShowMaximize="False"
-	   ShowMinimize="False"/>
-        <ui:DynamicScrollViewer Grid.Row="1">
-            <StackPanel Margin="20,10,20,20" x:Name="mainContent" >
-                <Button Content="关闭“自动播放”通知" Click="Button_Click" Margin="0,0,0,20"/>
-                <ui:CardExpander VerticalAlignment="Stretch" Header="启动配置" IsExpanded="True" Margin="0,0,0,20" Padding="20,16,20,16">
-                    <StackPanel>
-                        <ui:ToggleSwitch x:Name="StartWithWindows"
-                                    Content="开机自启动"
-                                    Margin="0,0,0,10" HorizontalAlignment="Stretch"/>
+        <ui:TitleBar Title="设置"/>
+        <WrapPanel Grid.Row="1" Margin="15,0,15,10">
+            <Button Content="关闭「自动播放」" Click="Button_Click"/>
+        </WrapPanel>
+        <ui:DynamicScrollViewer Grid.Row="2" x:Name="mainContent">
+            <Grid Margin="10">
 
-                        <ui:ToggleSwitch x:Name="MinimizeToTray" IsEnabled="False"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="7,0">
+                    <ui:CardExpander VerticalAlignment="Stretch" Header="启动配置" IsExpanded="True" Margin="0,0,0,15" Padding="25,16">
+                        <StackPanel>
+                            <ui:ToggleSwitch x:Name="StartWithWindows"
+                                    Content="开机自启动"
+                                    Margin="0,10" HorizontalAlignment="Stretch"/>
+
+                            <ui:ToggleSwitch x:Name="MinimizeToTray" IsEnabled="False"
                                     Content="最小化到托盘"
-                                    Margin="0,0,0,10" HorizontalAlignment="Stretch"/>
-                    </StackPanel>
-                </ui:CardExpander>
-                <ui:CardExpander Header="窗口行为" IsExpanded="True" Margin="0,0,0,20" Padding="20,16,20,16">
-                    <StackPanel>
-                        <ui:ToggleSwitch x:Name="TopMost"
-                            Content="始终在最上层"
-                            Margin="0,0,0,10" HorizontalAlignment="Stretch"/>
-                        <DockPanel Margin="0,0,0,10">
-                            <TextBlock Text="默认窗口位置" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="Position" HorizontalAlignment="Right"/>
-                        </DockPanel>
-                        <DockPanel Margin="0,0,0,10">
-                            <TextBlock Text="默认窗口宽度" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <ui:Button HorizontalAlignment="Right" Margin="10,0,0,0" Click="Restore_WindowWidth_Click">重置</ui:Button>
-                            <ui:NumberBox x:Name="WindowWidth" 
+                                    Margin="0,10" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </ui:CardExpander>
+                    <ui:CardExpander Header="窗口行为" IsExpanded="True" Margin="0,0,0,15" Padding="25,16">
+                        <StackPanel>
+                            <ui:ToggleSwitch x:Name="TopMost"
+                            Content="始终在最上层" 
+                            Margin="0,10" HorizontalAlignment="Stretch"/>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="默认窗口位置" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="Position" HorizontalAlignment="Right"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="默认窗口宽度" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <ui:Button HorizontalAlignment="Right" Margin="10,0,0,0" Click="Restore_WindowWidth_Click">重置</ui:Button>
+                                <ui:NumberBox x:Name="WindowWidth"
                                         HorizontalAlignment="Right"
                                         Width="140"
                                         Minimum="350"
                                         Maximum="800"/>
-                        </DockPanel>
-                    </StackPanel>
-                </ui:CardExpander>
-                <ui:CardExpander Header="外观" IsExpanded="True" Margin="0,0,0,20" Padding="20,16,20,16">
-                    <StackPanel>
-                        <DockPanel Margin="0,0,0,10">
-                            <TextBlock Text="颜色主题" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="ThemeSelector" HorizontalAlignment="Right"/>
-                        </DockPanel>
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="60"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,0,0,15">U盘图标</TextBlock>
-                            <Image Grid.Row="1" Grid.Column="0" Source="ud.png" x:Name="IconImage"/>
-                            <StackPanel Grid.Row="1" Grid.Column="1"  Margin="10,0,0,0">
-                                <RadioButton x:Name="IconType0" Content="彩色" GroupName="IconType" Margin="0,0,0,0" Checked="IconType0_Checked"/>
-                                <RadioButton x:Name="IconType1" Content="简约线条" GroupName="IconType" Margin="0,0,0,0" Checked="IconType1_Checked" HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                </ui:CardExpander>
-                
-                <StackPanel Margin="20,10,10,10">
-                    <TextBlock TextWrapping="Wrap">其它功能需求、建议？</TextBlock>
-                    <ui:HyperlinkButton
+                            </DockPanel>
+                        </StackPanel>
+                    </ui:CardExpander>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="7,0">
+                    <ui:CardExpander Header="外观" IsExpanded="True" Margin="0,0,0,15" Padding="25,16">
+                        <StackPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="颜色主题" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="ThemeSelector" HorizontalAlignment="Right"/>
+                            </DockPanel>
+                            <ui:ToggleSwitch x:Name="ShowOpen"
+                            Content="显示「打开U盘」按钮" 
+                            Margin="0,10" HorizontalAlignment="Stretch"/>
+                            <Grid Margin="0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="60"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,0,0,15">U盘图标</TextBlock>
+                                <Image Grid.Row="1" Grid.Column="0" Source="ud.png" x:Name="IconImage"/>
+                                <StackPanel Grid.Row="1" Grid.Column="1"  Margin="10,0,0,0">
+                                    <RadioButton x:Name="IconType0" Content="彩色" GroupName="IconType" Margin="0,0,0,0" Checked="IconType0_Checked"/>
+                                    <RadioButton x:Name="IconType1" Content="简约线条" GroupName="IconType" Margin="0,0,0,0" Checked="IconType1_Checked" HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <StackPanel Margin="20,10,10,10">
+                        <TextBlock TextWrapping="Wrap">其它功能需求、建议？</TextBlock>
+                        <ui:HyperlinkButton
                     Content="前往 Github 提交 issue"
                     NavigateUri="https://github.com/starry-source/DewUSB/issues" Margin="10,10,0,0"></ui:HyperlinkButton>
+                    </StackPanel>
                 </StackPanel>
+            </Grid>
 
-            </StackPanel>
         </ui:DynamicScrollViewer>
-        <ui:Button x:Name="SaveButton"
-                      Content="保存"
-                      HorizontalAlignment="Right"
-                      Margin="0,0,20,20"
-                      Appearance="Primary" VerticalAlignment="Bottom" Grid.Row="2" Width="70"/>
-        <StackPanel x:Name="fly" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden" Grid.Row="1">
-            <TextBlock TextWrapping="Wrap" Margin="10,10,10,0" Text="更改已保存" FontSize="18"></TextBlock>
-            <TextBlock TextWrapping="Wrap" Margin="10,5,10,0" Text="部分设置需要重启才能应用。"></TextBlock>
-            <DockPanel Margin="0,10,0,0" HorizontalAlignment="Right">
-                <ui:Button Content="立即重启" Click="RestartButton_Click" Margin="0,0,10,0" Appearance="Primary"/>
-                <ui:Button Content="暂不" Click="CancelButton_Click"/>
-            </DockPanel>
+        <ui:TextBlock HorizontalAlignment="Left" Margin="20,0,0,0" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center"
+                      x:Name="Tip" Text="关闭设置后，更改才能生效。" Opacity="0.5"/>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,20,0"
+                    Grid.Row="3" VerticalAlignment="Center">
+            <ui:Button x:Name="RestartButton" Click="RestartButton_Click"
+                      Content="重启" Visibility="Collapsed" Margin="0,0,10,0"
+                      Appearance="Primary" Width="70"/>
+            <ui:Button x:Name="CloseButton" Click="CloseButton_Click"
+                      Content="关闭" Width="70"/>
         </StackPanel>
-        <ui:TextBlock HorizontalAlignment="Left" Margin="20,0,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Text="更改后可能需要刷新才生效。" Opacity="0.6"/>
     </Grid>
+    
 </ui:FluentWindow>

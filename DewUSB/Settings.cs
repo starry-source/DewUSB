@@ -15,6 +15,8 @@ namespace DewUSB
         public int Position { get; set; } = 2; // 默认右下
         public int IconType { get; set; } = 0; // 默认彩色
 
+        public bool ShowOpen { get; set; } = true; // 显示打开按钮
+
         public int WindowWidth { get; set; } = 400; // 默认窗口宽度
 
         private static readonly string SettingsPath = Path.Combine(
