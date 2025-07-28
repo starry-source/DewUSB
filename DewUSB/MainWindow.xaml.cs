@@ -4,17 +4,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Wpf.Ui;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -198,19 +195,22 @@ namespace DewUSB
         }
 
         /// <summary>
-        /// 创建设备卡片（带动画）
+        /// 创建设备卡片
         /// </summary>
         private UIElement CreateDeviceGrid(DriveInfo drive)
         {
             var containerGrid = new Grid();
-            var border = new Border
+            var deviceCard = new CardAction
             {
-                Style = FindResource("DeviceCardStyle") as Style
+                Margin=new Thickness(10,0,10,0),
+                Padding=new Thickness(0),
+                IsChevronVisible = false,
             };
+
             var contentGrid = new Grid();
             contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(92) });
             contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            border.MouseLeftButtonDown += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+            deviceCard.Click += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
             string uri;
             if (settings.IconType == 0)
             {
@@ -295,17 +295,25 @@ namespace DewUSB
                     Margin = new Thickness(0, 0, 10, 0),
                     Appearance = Wpf.Ui.Controls.ControlAppearance.Primary
                 };
-                openButton.Click += (s, e) => System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+                openButton.Click += (s, e) => {
+                    e.Handled = true;
+                    System.Diagnostics.Process.Start("explorer.exe", drive.Name);
+
+                };
                 buttonsPanel.Children.Add(openButton);
             }
+
+            
             var ejectButton = new Wpf.Ui.Controls.Button
             {
-                Content = "安全弹出",
-                Appearance = Wpf.Ui.Controls.ControlAppearance.Secondary
+                Content = "弹出",
+                Appearance = Wpf.Ui.Controls.ControlAppearance.Secondary,
+                Margin=new Thickness(0,0, 10, 0)
             };
             // 弹出U盘逻辑，带反馈
             ejectButton.Click += (s, e) =>
             {
+                e.Handled = true;
                 bool result = EjectDrive(drive.Name);
                 if (result)
                 {
@@ -317,16 +325,29 @@ namespace DewUSB
                 }
             };
             buttonsPanel.Children.Add(ejectButton);
+
+            var processButton = new Wpf.Ui.Controls.Button
+            {
+                Content = "进程",
+                Margin = new Thickness(0, 0, 10, 0),
+                Appearance = Wpf.Ui.Controls.ControlAppearance.Secondary
+            };
+            processButton.Click += (s, e) => { 
+                e.Handled = true;
+                ShowProcessWindow(drive.Name);
+            };
+            buttonsPanel.Children.Add(processButton);
+
             infoPanel.Children.Add(headerPanel);
             infoPanel.Children.Add(progressContainer);
             infoPanel.Children.Add(buttonsPanel);
             contentGrid.Children.Add(image);
             contentGrid.Children.Add(infoPanel);
-            border.Child = contentGrid;
-            containerGrid.Children.Add(border);
+            deviceCard.Content = contentGrid;
+            containerGrid.Children.Add(deviceCard);
             // 淡入动画
             var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
-            border.BeginAnimation(Border.OpacityProperty, fade);
+            deviceCard.BeginAnimation(Border.OpacityProperty, fade);
             return containerGrid;
         }
 
@@ -559,6 +580,7 @@ namespace DewUSB
             {
                 UpdateDevices();
             }
+            catch (System.NullReferenceException) { }
             catch (Exception) { }
         }
 
@@ -624,6 +646,13 @@ namespace DewUSB
         private void Refresh_Button_Click(object sender, RoutedEventArgs e)
         {
             UpdateDevices();
+        }
+
+        private void ShowProcessWindow(string driveLetter)
+        {
+            var processWindow = new ProcessInfoWindow(driveLetter);
+            processWindow.Owner = this;
+            processWindow.ShowDialog();
         }
     }
 }

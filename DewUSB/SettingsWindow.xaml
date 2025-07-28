@@ -23,7 +23,8 @@ WindowCornerPreference="Round">
         </Grid.RowDefinitions>
         <ui:TitleBar Title="设置"/>
         <WrapPanel Grid.Row="1" Margin="15,0,15,10">
-            <Button Content="关闭「自动播放」" Click="Button_Click"/>
+            <Button Content="关闭「自动播放」" Click="Button_Click" Margin="0,0,10,0"/>
+            <ui:Anchor Content="最新发布页" NavigateUri="https://github.com/starry-source/DewUSB/releases"/>
         </WrapPanel>
         <ui:DynamicScrollViewer Grid.Row="2" x:Name="mainContent">
             <Grid Margin="10">

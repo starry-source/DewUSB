@@ -13,10 +13,10 @@
   </span>
   <!-- <span href="https://github.com/starry-source/DewUSB/issues" style="text-decoration:none">
     <img src="https://img.shields.io/github/issues/starry-source/DewUSB.svg" alt="GitHub issues"/>
-  </span>
+  </span> -->
   <span href="https://github.com/starry-source/DewUSB/network" style="text-decoration:none">
     <img src="https://img.shields.io/github/forks/starry-source/DewUSB.svg" alt="GitHub forks"/>
-  </span> -->
+  </span>
   <span style="text-decoration:none">
     <img src="https://img.shields.io/github/license/starry-source/DewUSB" alt="GitHub License"/>
   </pan>
@@ -24,9 +24,8 @@
 
 ## 简介
 一个简约美观的U盘助手
-
 ![深色界面预览](./art/dark.jpg)
-
+（界面有变化，请以实际为准）
 ## 正常使用
 
 - 在右侧 Releases 中下载最新版本的压缩包（`.rar` 文件）。
@@ -39,4 +38,4 @@
 ## 开发环境
 
 Windows 11 24h2\
-.NET Framework 4.7.2
+.NET 8
